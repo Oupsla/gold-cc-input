@@ -282,6 +282,11 @@ Custom property | Description | Default
           }
 
           this._handleAutoValidate();
+
+          //Show type of card if possible
+          if(this.$.input.value.length >= 19) {
+            this.validate();
+          }
         },
 
         /**
