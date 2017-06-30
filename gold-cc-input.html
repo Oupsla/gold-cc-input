@@ -51,8 +51,8 @@ See `Polymer.PaperInputBehavior` for more API docs.
 See `Polymer.PaperInputContainer` for a list of custom properties used to
 style this element.
 
-Custom property | Description | Default 
-----------------|-------------|---------- 
+Custom property | Description | Default
+----------------|-------------|----------
 `----gold-cc-input-icon-container` | Mixin applied to the icon container | `{}`
 
 @group Gold Elements
@@ -130,66 +130,35 @@ Custom property | Description | Default
 
       <label slot="label" hidden$="[[!label]]">[[label]]</label>
 
-      <span id="template-placeholder"></span>
+      <iron-input id="input"
+              class="container"
+              allowed-pattern="[0-9 ]"
+              slot="input"
+              bind-value="{{value}}"
+              invalid="{{invalid}}">
+              <input id="nativeInput"
+                maxlength="19"
+                aria-labelledby$="[[_ariaLabelledBy]]"
+                aria-describedby$="[[_ariaDescribedBy]]"
+                type="tel"
+                required$="[[required]]"
+                prevent-invalid-input
+                autocomplete="cc-number"
+                name$="[[name]]"
+                disabled$="[[disabled]]"
+                autofocus$="[[autofocus]]"
+                inputmode$="[[inputmode]]"
+                placeholder$="[[placeholder]]"
+                readonly$="[[readonly]]"
+                size$="[[size]]">
+              <div class="icon-container"><iron-icon id="icon"></iron-icon></div>
+            </iron-input>
 
       <template is="dom-if" if="[[errorMessage]]">
-        <paper-input-error slot="add-on" id="error">
-          [[errorMessage]]
-        </paper-input-error>
+        <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>>
       </template>
 
     </paper-input-container>
-  </template>
-
-  <template id="v0">
-    <div class="container">
-      <input is="iron-input" id="input" slot="input"
-          aria-labelledby$="[[_ariaLabelledBy]]"
-          aria-describedby$="[[_ariaDescribedBy]]"
-          bind-value="{{value}}"
-          type="tel"
-          maxlength="30"
-          required$="[[required]]"
-          allowed-pattern="[0-9 ]"
-          prevent-invalid-input
-          autocomplete="cc-number"
-          name$="[[name]]"
-          disabled$="[[disabled]]"
-          invalid="{{invalid}}"
-          autofocus$="[[autofocus]]"
-          inputmode$="[[inputmode]]"
-          placeholder$="[[placeholder]]"
-          readonly$="[[readonly]]"
-          size$="[[size]]">
-      <div class="icon-container"><iron-icon id="icon"></iron-icon></div>
-    </div>
-  </template>
-
-  <template id="v1">
-    <iron-input id="input" slot="input"
-        allowed-pattern="[0-9 ]"
-        bind-value="{{value}}"
-        invalid="{{invalid}}"
-        maxlength="30">
-      <input id="nativeInput"
-          aria-labelledby$="[[_ariaLabelledBy]]"
-          aria-describedby$="[[_ariaDescribedBy]]"
-          invalid$="{{invalid}}"
-          required$="[[required]]"
-          type="tel"
-          prevent-invalid-input
-          autocomplete="cc-number"
-          name$="[[name]]"
-          disabled$="[[disabled]]"
-          autofocus$="[[autofocus]]"
-          inputmode$="[[inputmode]]"
-          placeholder$="[[placeholder]]"
-          readonly$="[[readonly]]"
-          size$="[[size]]">
-    </iron-input>
-    <div class="icon-container" slot="suffix">
-      <iron-icon id="icon"></iron-icon>
-    </div>
   </template>
 
   <script>
@@ -249,17 +218,6 @@ Custom property | Description | Default
           }
         },
 
-        beforeRegister: function() {
-          this._beforeRegister();
-        },
-
-        _beforeRegister: function() {
-          var template = Polymer.DomModule.import('gold-cc-input', 'template');
-          var version = Polymer.Element ? 'v1' : 'v0';
-          var inputTemplate = Polymer.DomModule.import('gold-cc-input', 'template#' + version);
-          var inputPlaceholder = template.content.querySelector('#template-placeholder');
-          inputPlaceholder.parentNode.replaceChild(inputTemplate.content, inputPlaceholder);
-        },
         /**
         * Returns a reference to the focusable element. Overridden from PaperInputBehavior
         * to correctly focus the native input.
@@ -283,17 +241,19 @@ Custom property | Description | Default
         /**
          * A handler that is called when cardTypes changes
          */
-        _onCardTypesChanged: function(cardTypes, oldValue) {
-          if (this.value)
-            this._handleAutoValidate();
-        },
+         _onCardTypesChanged(cardTypes, oldValue) {
+           if (this.value) {
+             this._handleAutoValidate();
+           }
+         },
 
         /**
          * A handler that is called on input
          */
         _onValueChanged: function(value, oldValue) {
-          if (oldValue == undefined)
+          if (oldValue == undefined) {
             return;
+          }
 
           var start = this.$.input.selectionStart;
           var previousCharASpace = value ? this.value.charAt(start - 1) == ' ' : false;
@@ -326,6 +286,10 @@ Custom property | Description | Default
          * @return {boolean} Whether the input is currently valid or not.
          */
         validate: function() {
+          if (this.value == undefined) {
+            return true;
+          }
+
           // Empty, non-required input is valid.
           if (!this.required && this.value == '') {
             return true;
@@ -364,14 +328,11 @@ Custom property | Description | Default
         /**
          * Overidden from Polymer.IronControlState.
          */
-        _onFocusedChanged: function(focused) {
-          if (!this._focusableElement) {
-            return;
-          }
-          if (!focused) {
-            this._handleAutoValidate();
-          }
-        },
+         _onFocusedChanged(focused) {
+           if (!focused && this.value) {
+             this._handleAutoValidate();
+           }
+         }
       })
 
     })();
