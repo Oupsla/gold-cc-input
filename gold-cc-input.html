@@ -167,6 +167,11 @@ Custom property | Description | Default
 
         is: 'gold-cc-input',
 
+        /* The underlying dateInput is tabbable */
+        hostAttributes: {
+          'tabindex': -1
+        },
+
         behaviors: [
           Polymer.PaperInputBehavior,
           Polymer.IronValidatableBehavior,
